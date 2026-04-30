@@ -5,14 +5,18 @@
     // =========================================================================
     // Debug logger (writes to #quizify-status if present)
     // =========================================================================
-    // Platform-agnostic card actions (Desktop pycmd vs AnkiDroid global functions)
+    // Platform-agnostic card actions
+    // Desktop: pycmd('ans') / pycmd('easeN')
+    // AnkiDroid (both old & new viewer): showAnswer() flips card
+    //   Auto-rating (buttonAnswerEaseN) is NOT supported on new viewer
+    //   (signal: URLs show unsupported warning). User rates manually.
     window.__showAnswer = function() {
         if (typeof pycmd === 'function') { pycmd('ans'); }
         else if (typeof showAnswer === 'function') { showAnswer(); }
     };
     window.__rateCard = function(ease) {
+        // Only works on Desktop via pycmd. AnkiDroid: manual rating only.
         if (typeof pycmd === 'function') { pycmd('ease' + ease); }
-        else { var fn = window['buttonAnswerEase' + ease]; if (typeof fn === 'function') fn(); }
     };
 
     window.__quizifyLog = function(tag, msg) {
