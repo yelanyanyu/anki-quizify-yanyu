@@ -2,14 +2,23 @@
 
 Version: 0.1.1
 Readme: https://github.com/e-chehil/anki-quizify/blob/main/README.md
-Contact Details: 
+Contact Details:
 - Email: chehil@163.com
 - WeChat Official Account: Regenhof
 
 -->
 <div class="quizify-flashcard">
+    <div id="quizify-status" style="font:10px monospace;color:#fff;background:#222;padding:2px 8px;border-radius:0 0 4px 4px;margin:0 2em;word-break:break-all;"></div>
+    <script>if(!window.__quizifyLog){window.__quizifyLog=function(t,m){var e=document.getElementById("quizify-status");if(e)e.textContent=(e.textContent||"")+" ["+t+"] "+m;};} __quizifyLog("BACK","loaded");</script>
     <div class="quizify-deck">{{Deck}}</div>
     <div class="quizify-field quizify-field--front">{{Front}}</div>
+    {{#ExampleList}}
+    <div class="quizify-example-list">
+        <span class="quizify-example-list__raw" style="display:none">{{ExampleList}}</span>
+        <div class="quizify-example-list__summary"></div>
+        <div class="quizify-example-list__items"></div>
+    </div>
+    {{/ExampleList}}
     {{#Back}}
     <hr class="quizify-divider quizify-divider--answer">
     <div class="quizify-field quizify-field--back">{{Back}}</div>
@@ -221,7 +230,7 @@ Contact Details:
     function restoreOptions(options) {
         const labels = Array.from(options.getElementsByTagName("label")).map(label => {
             const inputValue = label.querySelector('input').value;
-            return { label, inputValue };
+            return {label, inputValue};
         });
         labels.sort((a, b) => a.inputValue.localeCompare(b.inputValue));
         labels.forEach(item => options.appendChild(item.label));
@@ -264,7 +273,7 @@ Contact Details:
                 input.style.display = "none";
                 seq.style.display = "inline-block";
             });
-            
+
             const correctArray = correct.split("").sort();
             let selectedOptions = [];
             Array.from(options.getElementsByTagName("input")).forEach(input => {
@@ -347,22 +356,22 @@ Contact Details:
 <script>
     document.querySelectorAll('.blank').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("focus", function() {
+        element.addEventListener("focus", function () {
             manageBlank(this);
         });
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 manageBlank(this);
             }
         });
-        element.addEventListener("mousedown", function(event) {
+        element.addEventListener("mousedown", function (event) {
             event.preventDefault();
         });
     });
 
     document.querySelectorAll('input[type="checkbox"]').forEach(element => {
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 element.checked = !element.checked;
             }
@@ -371,7 +380,7 @@ Contact Details:
 
     document.querySelectorAll('.feedback').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 validateChoice(this);
@@ -381,7 +390,7 @@ Contact Details:
 
     document.querySelectorAll('.reveal').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 toggleReveal(this);
@@ -391,7 +400,7 @@ Contact Details:
 
     document.querySelectorAll('.caption').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 toggleExpand(this);
@@ -401,13 +410,13 @@ Contact Details:
 
     document.querySelectorAll('.popup').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 togglePopup(this, e);
             }
         });
-        element.addEventListener("blur", function() {
+        element.addEventListener("blur", function () {
             const comment = element.querySelector('.comment');
             comment.style.opacity = 0;
             comment.style.visibility = "hidden";
@@ -444,7 +453,7 @@ Contact Details:
         });
     });
 
-    document.addEventListener("keydown", function(event) {
+    document.addEventListener("keydown", function (event) {
         if (document.activeElement !== entry) {
             if (event.shiftKey && event.code === 'KeyR') {
                 playAutoAudio();
@@ -458,23 +467,34 @@ Contact Details:
             switch (event.key) {
                 case "1":
                     event.preventDefault();
-                    buttonAnswerEase1();
+                    pycmd('ease1');
                     break;
                 case "2":
                     event.preventDefault();
-                    buttonAnswerEase2();
+                    pycmd('ease2');
                     break;
                 case "3":
                     event.preventDefault();
-                    buttonAnswerEase3();
+                    pycmd('ease3');
                     break;
                 case "4":
                     event.preventDefault();
-                    buttonAnswerEase4();
+                    pycmd('ease4');
                     break;
             }
         }
     });
-
-/* 献给所有热爱生活热爱学习的朋友。翏央，20250214 */
 </script>
+<script>
+    (function () {
+        var ease = window.__quizifyEase;
+        if (ease) {
+            delete window.__quizifyEase;
+            if (typeof pycmd === 'function') {
+                setTimeout(function() { pycmd('ease' + ease); }, 0);
+            }
+        }
+    })();
+</script>
+
+<script src="_quizify.js"></script>

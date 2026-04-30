@@ -104,6 +104,7 @@
         <option value="0">卡片 1 — 全部模块</option>
         <option value="1">卡片 2 — 填空 + 单选</option>
         <option value="2">卡片 3 — 多选 + 折叠 + 揭示</option>
+        <option value="3">卡片 4 — 例句渐进揭示</option>
     </select>
     <span class="sep">|</span>
     <button id="btn-day" class="active" onclick="setMode('day')">日间</button>
@@ -381,6 +382,13 @@ C. ✓ 杜甫《茅屋为秋风所破歌》<br>
 D. ✓ 杜甫《登高》<br>
 E. ✗ 李商隐《无题》`,
         tags: "唐诗 杜甫 诗词鉴赏"
+    },
+    {
+        deck: "英语学习::GRE词汇::高级词汇",
+        front: '<b>ephemeral</b><br><div class="pronunciation-us"><span style="cursor:pointer" onclick="playAudio(this.parentElement)">🇺🇸 /ɪˈfem.ər.əl/</span><audio src="ephemeral_us.mp3" preload="none"></audio></div>',
+        back: '<b>ephemeral</b> — 短暂的，转瞬即逝的<br><br>形容词，源自希腊语 <i>ephemeros</i>（"仅持续一天"）。<br><br>近义词：transient, fleeting, momentary<br>反义词：permanent, eternal, perpetual',
+        tags: "GRE 词汇 形容词 核心",
+        exampleList: 'The beauty of cherry blossoms is ephemeral, lasting only a few days.::cherry.mp3||The ephemeral nature of youth is a common theme in poetry.||Social media trends are often ephemeral, disappearing within weeks.::trend.mp3'
     }
 ];
 </script>
@@ -396,6 +404,15 @@ function buildCardHTML(card, showBack) {
     var html = '<div class="quizify-flashcard">';
     html += '<div class="quizify-deck">' + card.deck + '</div>';
     html += '<div class="quizify-field quizify-field--front">' + card.front + '</div>';
+
+    if (card.exampleList) {
+        html += '<div class="quizify-example-list">';
+        html += '<span class="quizify-example-list__raw" style="display:none">' + card.exampleList + '</span>';
+        html += '<div class="quizify-example-list__summary"></div>';
+        html += '<div class="quizify-example-list__items"></div>';
+        html += '<div class="quizify-example-list__controls"></div>';
+        html += '</div>';
+    }
 
     if (showBack && card.back) {
         html += '<hr class="quizify-divider quizify-divider--answer">';
@@ -545,6 +562,76 @@ function setupBack() {
     });
 }
 
+function setupBackExamples() {
+    var rawEl = document.querySelector('.quizify-example-list .quizify-example-list__raw');
+    if (!rawEl) return;
+    var raw = rawEl.innerHTML;
+    if (!raw || !raw.trim()) return;
+    var examples = raw.split(/\|\|/g).filter(function(s) { return s.trim(); }).map(function(line) {
+        var idx = line.indexOf('::');
+        if (idx > -1) { var ra = line.substring(idx + 2).trim(); var a = ra; if (a.indexOf("[sound:") === 0 && a.lastIndexOf("]") === a.length - 1) { a = a.slice(7, -1); } return { text: line.substring(0, idx).trim(), audio: a }; }
+        return { text: line.trim(), audio: null };
+    });
+    if (examples.length === 0) return;
+
+    var knownCount = 0;
+    try {
+        var stateStr = window.__quizifyRevealState;
+        if (stateStr) {
+            var parts = stateStr.split(':');
+            knownCount = parseInt(parts[0]) || 0;
+            delete window.__quizifyRevealState;
+        }
+    } catch (e) {}
+
+    var summaryEl = document.querySelector('.quizify-example-list .quizify-example-list__summary');
+    if (summaryEl) {
+        summaryEl.textContent = '认识了 ' + knownCount + '/' + examples.length + ' 个例句';
+    }
+
+    var itemsEl = document.querySelector('.quizify-example-list .quizify-example-list__items');
+    if (!itemsEl) return;
+    for (var i = 0; i < examples.length; i++) {
+        var item = document.createElement('div');
+        item.className = 'quizify-example-list__item quizify-example-list__item--visible';
+        if (i < knownCount) {
+            item.className += ' quizify-example-list__item--known';
+        } else {
+            item.className += ' quizify-example-list__item--unrevealed';
+        }
+        var indicator = document.createElement('span');
+        if (examples[i].audio) {
+            indicator.className = 'quizify-audio-indicator quizify-audio-indicator--available';
+            indicator.textContent = '▶';
+            var audioEl = document.createElement('audio');
+            audioEl.src = examples[i].audio;
+            audioEl.preload = 'none';
+            audioEl.style.display = 'none';
+            item.appendChild(indicator);
+            item.appendChild(audioEl);
+            item.addEventListener('click', (function(el) { return function() { var a = el.querySelector('audio'); if (a) { a.pause(); a.currentTime = 0; a.play(); } }; })(item));
+        } else {
+            indicator.className = 'quizify-audio-indicator quizify-audio-indicator--muted';
+            indicator.textContent = '⊘';
+            item.appendChild(indicator);
+        }
+        var mark = document.createElement('span');
+        if (i < knownCount) {
+            mark.className = 'quizify-example-list__result-mark quizify-example-list__result-mark--known';
+            mark.textContent = '✓';
+        } else {
+            mark.className = 'quizify-example-list__result-mark quizify-example-list__result-mark--unrevealed';
+            mark.textContent = '✗';
+        }
+        item.appendChild(mark);
+        var textSpan = document.createElement('span');
+        textSpan.className = 'quizify-example-list__item-text';
+        textSpan.textContent = examples[i].text;
+        item.appendChild(textSpan);
+        itemsEl.appendChild(item);
+    }
+}
+
 function renderCard(index, showBack) {
     var card = CARDS[index];
     var area = document.getElementById('card-area');
@@ -559,8 +646,12 @@ function renderCard(index, showBack) {
 
         if (showBack) {
             setupBack();
+            setupBackExamples();
         } else {
             setupFront();
+            if (typeof QuizifyNestedReveal !== 'undefined') {
+                QuizifyNestedReveal.init();
+            }
         }
 
         area.classList.remove('fading');
@@ -593,6 +684,12 @@ function flipCard() {
     if (showingBack) {
         renderCard(currentCard, false);
     } else {
+        var ease = window.__quizifyEase;
+        if (ease) {
+            delete window.__quizifyEase;
+            rate(parseInt(ease));
+            return;
+        }
         renderCard(currentCard, true);
     }
 }
@@ -618,6 +715,211 @@ function rate(n) {
     console.log('Anki 评分: ' + labels[n] + ' (' + n + ') — 仅在真实 Anki 中生效');
     nextCard();
 }
+
+// Anki API shims for test harness
+function showAnswer() {
+    flipCard();
+}
+function buttonAnswerEase1() { rate(1); }
+function buttonAnswerEase2() { rate(2); }
+function buttonAnswerEase3() { rate(3); }
+function buttonAnswerEase4() { rate(4); }
+
+// =============================================================================
+// QuizifyNestedReveal — 逐层渐进揭示 & 自动评分模块 (test.html copy)
+// =============================================================================
+var QuizifyNestedReveal = (function() {
+    var state = {
+        phase: 'initial',
+        currentIndex: 0,
+        examples: [],
+        totalCount: 0,
+        initialControlsHTML: '',
+        revealControlsHTML: '',
+        easyConfirmControlsHTML: ''
+    };
+
+    function parseExamples(raw) {
+        if (!raw) return [];
+        return raw.split(/\|\|/g).filter(function(s) { return s.trim(); }).map(function(line) {
+            var idx = line.indexOf('::');
+            if (idx > -1) {
+                return { text: line.substring(0, idx).trim(), audio: line.substring(idx + 2).trim() };
+            }
+            return { text: line.trim(), audio: null };
+        });
+    }
+
+    function buildItemHTML(item, i) {
+        var audioHTML = '';
+        if (item.audio) {
+            audioHTML = '<span class="quizify-audio-indicator quizify-audio-indicator--available" onclick="event.stopPropagation();QuizifyNestedReveal.playItemAudio(this.parentElement)">&#9654;</span><audio src="' + item.audio + '" preload="none" style="display:none"></audio>';
+        } else {
+            audioHTML = '<span class="quizify-audio-indicator quizify-audio-indicator--muted">&#8855;</span>';
+        }
+        return '<div class="quizify-example-list__item quizify-example-list__item--hidden" data-index="' + i + '" onclick="QuizifyNestedReveal.playItemAudio(this)">' +
+            audioHTML +
+            '<span class="quizify-example-list__item-text">' + item.text + '</span>' +
+            '</div>';
+    }
+
+    function renderAllItems() {
+        var html = '';
+        for (var i = 0; i < state.totalCount; i++) {
+            html += buildItemHTML(state.examples[i], i);
+        }
+        return html;
+    }
+
+    function buildControls(btnType) {
+        var html = '';
+        if (btnType === 'initial') {
+            html += '<div class="quizify-example-list__progress">1/' + (state.totalCount + 1) + '<\/div>';
+            html += '<button class="quizify-btn quizify-btn--unknown" type="button" onclick="window.QuizifyNestedReveal.handleUnknown();return false;">不认识<\/button>';
+            html += '<button class="quizify-btn quizify-btn--known" type="button" onclick="window.QuizifyNestedReveal.handleKnown();return false;">认识<\/button>';
+            html += '<button class="quizify-btn quizify-btn--easy" type="button" onclick="window.QuizifyNestedReveal.handleEasy();return false;">简单<\/button>';
+        } else if (btnType === 'revealing') {
+            var shown = state.currentIndex + 1;
+            if (shown > state.totalCount + 1) shown = state.totalCount + 1;
+            html += '<div class="quizify-example-list__progress">' + shown + '/' + (state.totalCount + 1) + '<\/div>';
+            html += '<button class="quizify-btn quizify-btn--unknown" type="button" onclick="window.QuizifyNestedReveal.handleUnknown();return false;">不认识<\/button>';
+            html += '<button class="quizify-btn quizify-btn--known" type="button" onclick="window.QuizifyNestedReveal.handleKnown();return false;">认识<\/button>';
+            html += '<button class="quizify-btn quizify-btn--easy" type="button" onclick="window.QuizifyNestedReveal.handleEasy();return false;">简单<\/button>';
+        } else if (btnType === 'easy_confirm') {
+            html += '<button class="quizify-btn quizify-btn--confirm-easy" type="button" onclick="window.QuizifyNestedReveal.handleEasy();return false;">确认简单<\/button>';
+        }
+        document.querySelector('.quizify-example-list__controls').innerHTML = html;
+    }
+
+    function revealNext() {
+        if (state.currentIndex >= state.totalCount) return;
+        var items = document.querySelectorAll('.quizify-example-list__item');
+        if (state.currentIndex < items.length) {
+            var item = items[state.currentIndex];
+            item.classList.remove('quizify-example-list__item--hidden');
+            requestAnimationFrame(function() {
+                item.classList.add('quizify-example-list__item--visible');
+            });
+        }
+        state.currentIndex++;
+    }
+
+    function revealAll() {
+        var items = document.querySelectorAll('.quizify-example-list__item');
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].classList.contains('quizify-example-list__item--hidden')) {
+                items[i].classList.remove('quizify-example-list__item--hidden');
+                requestAnimationFrame((function(idx) {
+                    return function() {
+                        items[idx].classList.add('quizify-example-list__item--visible');
+                    };
+                })(i));
+            }
+        }
+        state.currentIndex = state.totalCount;
+    }
+
+    function commitEase(ease) {
+        state.phase = 'done';
+        try {
+            window.__quizifyEase = ease;
+        } catch (e) { /* degrade gracefully */ }
+        if (typeof showAnswer === 'function') {
+            showAnswer();
+        }
+    }
+
+    function handleKnown() {
+        if (state.phase === 'initial') {
+            state.phase = 'revealing';
+            revealNext();
+            buildControls('revealing');
+            return;
+        }
+        if (state.phase === 'revealing') {
+            if (state.currentIndex >= state.totalCount) {
+                commitEase(3);
+                return;
+            }
+            revealNext();
+            buildControls('revealing');
+        }
+    }
+
+    function handleUnknown() {
+        var known = state.currentIndex;
+        if (state.phase === 'revealing' && known > 0) {
+            known = known - 1;
+        }
+        state.phase = 'done';
+        try {
+            window.__quizifyRevealState = known + ':' + state.totalCount;
+        } catch (e) { /* degrade gracefully */ }
+        if (typeof showAnswer === 'function') {
+            showAnswer();
+        }
+    }
+
+    function handleEasy() {
+        if (state.phase === 'initial' || state.phase === 'revealing') {
+            state.phase = 'easy_confirm';
+            revealAll();
+            buildControls('easy_confirm');
+        } else if (state.phase === 'easy_confirm') {
+            commitEase(4);
+        }
+    }
+
+    function playItemAudio(el) {
+        var audio = el.querySelector('audio');
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.play();
+        }
+    }
+
+    function handleKey(key) {
+        if (state.phase === 'done' || state.totalCount === 0) return false;
+        switch (key) {
+            case '1': handleUnknown(); return true;
+            case '2': handleKnown(); return true;
+            case '3': handleEasy(); return true;
+            default: return false;
+        }
+    }
+
+    function isActive() {
+        return state.totalCount > 0 && state.phase !== 'done';
+    }
+
+    function init() {
+        var rawEl = document.querySelector('.quizify-example-list__raw');
+        if (!rawEl) return;
+        var examples = parseExamples(rawEl.innerHTML);
+        state = {
+            phase: 'initial',
+            currentIndex: 0,
+            examples: examples,
+            totalCount: examples.length
+        };
+        if (state.totalCount === 0) return;
+        var itemsEl = document.querySelector('.quizify-example-list__items');
+        var controlsEl = document.querySelector('.quizify-example-list__controls');
+        itemsEl.innerHTML = renderAllItems();
+        buildControls('initial');
+    }
+
+    return {
+        init: init,
+        handleKey: handleKey,
+        isActive: isActive,
+        handleKnown: handleKnown,
+        handleUnknown: handleUnknown,
+        handleEasy: handleEasy,
+        playItemAudio: playItemAudio
+    };
+})();
 </script>
 
 <!-- ================================================================ -->
@@ -651,11 +953,12 @@ document.addEventListener("keydown", function(event) {
             case "4": event.preventDefault(); rate(4); break;
         }
     } else {
-        switch (event.key) {
-            case "1": case "2": case "3": case "4":
-                event.preventDefault();
-                flipCard();
-                break;
+        if (event.key === "1" || event.key === "2" || event.key === "3" || event.key === "4") {
+            event.preventDefault();
+            if (typeof QuizifyNestedReveal !== 'undefined' && QuizifyNestedReveal.handleKey(event.key)) {
+                return;
+            }
+            flipCard();
         }
     }
 });

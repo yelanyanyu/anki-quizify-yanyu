@@ -2,17 +2,30 @@
 
 Version: 0.1.1
 Readme: https://github.com/e-chehil/anki-quizify/blob/main/README.md
-Contact Details: 
+Contact Details:
 - Email: chehil@163.com
 - WeChat Official Account: Regenhof
 
 -->
+<script src="_quizify.js"></script>
+<script>
+// init already called by _quizify.js, just fix keyboard routing
+</script>
+
 <div class="quizify-flashcard">
+    <div id="quizify-status" style="font:10px monospace;color:#fff;background:#222;padding:2px 8px;border-radius:0 0 4px 4px;margin:0 2em;word-break:break-all;"></div>
     <div class="quizify-deck">{{Deck}}</div>
     <div class="quizify-field quizify-field--front">{{Front}}</div>
     {{#Tags}}
     <div class="quizify-tags">{{clickable:Tags}}</div>
     {{/Tags}}
+    {{#ExampleList}}
+    <div class="quizify-example-list">
+        <span class="quizify-example-list__raw" style="display:none">{{ExampleList}}</span>
+        <div class="quizify-example-list__items"></div>
+        <div class="quizify-example-list__controls"></div>
+    </div>
+    {{/ExampleList}}
 </div>
 
 <script>
@@ -217,7 +230,7 @@ Contact Details:
     function restoreOptions(options) {
         const labels = Array.from(options.getElementsByTagName("label")).map(label => {
             const inputValue = label.querySelector('input').value;
-            return { label, inputValue };
+            return {label, inputValue};
         });
         labels.sort((a, b) => a.inputValue.localeCompare(b.inputValue));
         labels.forEach(item => options.appendChild(item.label));
@@ -260,7 +273,7 @@ Contact Details:
                 input.style.display = "none";
                 seq.style.display = "inline-block";
             });
-            
+
             const correctArray = correct.split("").sort();
             let selectedOptions = [];
             Array.from(options.getElementsByTagName("input")).forEach(input => {
@@ -345,22 +358,22 @@ Contact Details:
 
     document.querySelectorAll('.blank').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("focus", function() {
+        element.addEventListener("focus", function () {
             manageBlank(this);
         });
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 manageBlank(this);
             }
         });
-        element.addEventListener("mousedown", function(event) {
+        element.addEventListener("mousedown", function (event) {
             event.preventDefault();
         });
     });
 
     document.querySelectorAll('input[type="checkbox"]').forEach(element => {
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 element.checked = !element.checked;
             }
@@ -369,7 +382,7 @@ Contact Details:
 
     document.querySelectorAll('.feedback').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 validateChoice(this);
@@ -379,7 +392,7 @@ Contact Details:
 
     document.querySelectorAll('.reveal').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 toggleReveal(this);
@@ -389,7 +402,7 @@ Contact Details:
 
     document.querySelectorAll('.caption').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 toggleExpand(this);
@@ -399,20 +412,20 @@ Contact Details:
 
     document.querySelectorAll('.popup').forEach(element => {
         element.setAttribute("tabindex", "0");
-        element.addEventListener("keydown", function(e) {
+        element.addEventListener("keydown", function (e) {
             if (e.key === "Control") {
                 e.preventDefault();
                 togglePopup(this, e);
             }
         });
-        element.addEventListener("blur", function() {
+        element.addEventListener("blur", function () {
             const comment = element.querySelector('.comment');
             comment.style.opacity = 0;
             comment.style.visibility = "hidden";
         });
     });
 
-    document.addEventListener("keydown", function(event) {
+    document.addEventListener("keydown", function (event) {
         if (document.activeElement !== entry) {
             if (event.shiftKey && event.code === 'KeyR') {
                 playAutoAudio();
@@ -425,10 +438,70 @@ Contact Details:
 
             if (event.key === "1" || event.key === "2" || event.key === "3" || event.key === "4") {
                 event.preventDefault();
-                showAnswer();
+                if (typeof window.QuizifyNestedReveal !== 'undefined' && window.QuizifyNestedReveal.handleKey(event.key)) {
+                    return;
+                }
+                if (typeof pycmd === "function") pycmd("ans");
             }
         }
     });
 
-/* 献给所有热爱生活热爱学习的朋友。翏央，20250214 */
+    if (typeof window.QuizifyNestedReveal !== 'undefined') {
+        try {
+            __quizifyLog('INIT', 'calling init');
+            window.QuizifyNestedReveal.init();
+            __quizifyLog('INIT', 'init done, isActive=' + window.QuizifyNestedReveal.isActive());
+        } catch (e) {
+            __quizifyLog('FATAL', 'init error: ' + e.message);
+        }
+    } else {
+        __quizifyLog('FATAL', 'QuizifyNestedReveal undefined');
+    }
+
+</script>
+
+<!-- Quizify Debug Panel -->
+<div id="quizify-debug"
+     style="display:none;position:fixed;bottom:48px;right:8px;width:380px;max-height:300px;overflow:auto;background:#1a1a2e;color:#0f0;font:11px monospace;padding:8px;border-radius:4px;z-index:99999;opacity:0.92;"></div>
+<button id="quizify-debug-toggle"
+        onclick="(function(){var d=document.getElementById('quizify-debug');d.style.display=d.style.display==='none'?'block':'none'})()"
+        style="position:fixed;bottom:8px;right:8px;width:24px;height:24px;background:#333;color:#aaa;border:none;border-radius:4px;font:12px monospace;cursor:pointer;z-index:99999;opacity:0.7;">
+    &#9881;
+</button>
+<script>
+    (function () {
+        var panel = document.getElementById('quizify-debug');
+
+        function log(tag, msg, color) {
+            var d = document.createElement('div');
+            d.style.color = color || '#0f0';
+            d.style.borderBottom = '1px solid #333';
+            d.style.padding = '2px 0';
+            d.textContent = '[' + tag + '] ' + msg;
+            panel.appendChild(d);
+            panel.scrollTop = panel.scrollHeight;
+        }
+
+        window.onerror = function (msg, src, line, col, err) {
+            log('ERR', (msg + '').substring(0, 200), '#f66');
+            return false;
+        };
+        var _log = console.log, _err = console.error, _warn = console.warn;
+        console.log = function () {
+            var s = Array.prototype.join.call(arguments, ' ');
+            log('LOG', s.substring(0, 200));
+            _log.apply(console, arguments);
+        };
+        console.error = function () {
+            var s = Array.prototype.join.call(arguments, ' ');
+            log('ERR', s.substring(0, 200), '#f66');
+            _err.apply(console, arguments);
+        };
+        console.warn = function () {
+            var s = Array.prototype.join.call(arguments, ' ');
+            log('WRN', s.substring(0, 200), '#fa0');
+            _warn.apply(console, arguments);
+        };
+        console.log('Quizify debug panel ready');
+    })();
 </script>

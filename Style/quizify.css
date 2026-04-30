@@ -2,7 +2,7 @@
 
 Version: 0.1.0
 Readme: https://github.com/e-chehil/anki-quizify/blob/main/README.md
-Contact Details: 
+Contact Details:
 - Email: chehil@163.com
 - WeChat Official Account: Regenhof
 
@@ -68,6 +68,18 @@ html {
     --link-fg: #2775b6;
     --link-fg-active: #1177b0;
     --deck-fg: var(--caption-fg);
+    --example-item-bg: #f7f4ed;
+    --example-item-fg: #475164;
+    --example-btn-known-bg: #5a8a4a;
+    --example-btn-known-fg: #fff;
+    --example-btn-unknown-bg: #c5413a;
+    --example-btn-unknown-fg: #fff;
+    --example-btn-easy-bg: #3a7aba;
+    --example-btn-easy-fg: #fff;
+    --example-btn-confirm-bg: #87723e;
+    --example-btn-confirm-fg: #fffef9;
+    --example-audio-available: #5a8a4a;
+    --example-audio-muted: #999;
     --tag-fg: #333333cc;
     --tag-bg: #3333330f;
     --tag-fg-active: #333333;
@@ -117,6 +129,11 @@ html {
     --tag-bg: #ffffff14;
     --tag-fg-active: #ffffff;
     --tag-bg-active: #ffffff1f;
+    --example-item-bg: #3e3841;
+    --example-item-fg: #c0c4c3;
+    --example-btn-confirm-bg: #93b5cf;
+    --example-btn-confirm-fg: #35333c;
+    --example-audio-muted: #666;
 }
 
 
@@ -131,7 +148,7 @@ html:not(.mobile) .card {
 }
 
 .card::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 /* -------------------------------------------------- 卡片 */
@@ -334,10 +351,10 @@ html:not(.mobile) .card {
 
 /* -------------------------------------------------- 折叠 */
 .caption::before {
-  content: "✦";
-  margin-right: 0.2em;
-  transition: all 0.3s ease-in-out;
-  display: inline-block;
+    content: "✦";
+    margin-right: 0.2em;
+    transition: all 0.3s ease-in-out;
+    display: inline-block;
 }
 
 .caption {
@@ -355,7 +372,7 @@ html:not(.mobile) .card {
 .caption:hover {
     color: var(--caption-fg-hover);
     background-color: var(--caption-border);
-    
+
 }
 
 .caption.active {
@@ -544,6 +561,7 @@ a, a:visited {
     text-decoration: none;
     color: var(--link-fg);
 }
+
 a:hover, a:active {
     text-decoration: underline;
     color: var(--link-fg-active);
@@ -602,25 +620,182 @@ mark {
     font-family: "Charis SIL";
 }
 
+/* -------------------------------------------------- 例句渐进揭示 */
+.quizify-example-list {
+    margin: 1em 2em 2em;
+}
+
+.mobile .quizify-example-list {
+    margin: 0.5em 1em 1em;
+}
+
+.quizify-example-list__items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+}
+
+.quizify-example-list__item {
+    background-color: var(--example-item-bg);
+    border-radius: 0.4em;
+    color: var(--example-item-fg);
+    cursor: pointer;
+    opacity: 0;
+    padding: 0.6em 0.8em;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    user-select: none;
+}
+
+.quizify-example-list__item--hidden {
+    display: none;
+}
+
+.quizify-example-list__item--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.quizify-example-list__item-text {
+    vertical-align: middle;
+}
+
+.quizify-example-list__controls {
+    display: flex;
+    gap: 0.5em;
+    margin-top: 0.8em;
+    align-items: center;
+}
+
+.mobile .quizify-example-list__controls {
+    gap: 0.4em;
+}
+
+.quizify-example-list__progress {
+    color: var(--caption-fg);
+    font-size: 0.8em;
+    margin-right: auto;
+}
+
+/* -------------------------------------------------- 渐进按钮 */
+.quizify-btn {
+    border: none;
+    border-radius: 0.4em;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-size: 0.95em;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+    padding: 0.5em 1.2em;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.quizify-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.quizify-btn:active {
+    transform: translateY(0);
+}
+
+.mobile .quizify-btn {
+    padding: 0.6em 1.4em;
+}
+
+.quizify-btn--known {
+    background-color: var(--example-btn-known-bg);
+    color: var(--example-btn-known-fg);
+}
+
+.quizify-btn--unknown {
+    background-color: var(--example-btn-unknown-bg);
+    color: var(--example-btn-unknown-fg);
+}
+
+.quizify-btn--easy {
+    background-color: var(--example-btn-easy-bg);
+    color: var(--example-btn-easy-fg);
+}
+
+.quizify-btn--confirm-easy {
+    background-color: var(--example-btn-confirm-bg);
+    color: var(--example-btn-confirm-fg);
+}
+
+/* -------------------------------------------------- 背面揭示结果 */
+.quizify-example-list__summary {
+    color: var(--caption-fg);
+    font-size: 0.85em;
+    margin-bottom: 0.6em;
+}
+
+.quizify-example-list__result-mark {
+    display: inline-block;
+    font-size: 0.85em;
+    margin-right: 0.4em;
+    vertical-align: middle;
+    width: 1.2em;
+    text-align: center;
+}
+
+.quizify-example-list__item--known {
+    background-color: var(--correct-bg);
+    color: var(--correct-fg);
+}
+
+.quizify-example-list__item--unrevealed {
+    opacity: 0.55;
+}
+
+.quizify-example-list__result-mark--known {
+    color: var(--correct-fg);
+}
+
+.quizify-example-list__result-mark--unrevealed {
+    color: var(--example-audio-muted);
+}
+
+/* -------------------------------------------------- 音频指示器 */
+.quizify-audio-indicator {
+    display: inline-block;
+    font-size: 0.85em;
+    margin-right: 0.4em;
+    vertical-align: middle;
+    width: 1.2em;
+    text-align: center;
+}
+
+.quizify-audio-indicator--available {
+    color: var(--example-audio-available);
+    cursor: pointer;
+}
+
+.quizify-audio-indicator--muted {
+    color: var(--example-audio-muted);
+    cursor: default;
+}
+
 /* -------------------------------------------------- 字体 */
 @font-face {
-  font-family: "Jiashu";
-  src: url("_HYJiaShu-55U.ttf");
+    font-family: "Jiashu";
+    src: url("_HYJiaShu-55U.ttf");
 }
 
 @font-face {
-  font-family: "Sassoon Montessori";
-  src: url("_SassoonMontessoriW01Regular.ttf");
+    font-family: "Sassoon Montessori";
+    src: url("_SassoonMontessoriW01Regular.ttf");
 }
 
 @font-face {
-  font-family: "Youkai";
-  src: url("_HYYouKai-55W.ttf");
+    font-family: "Youkai";
+    src: url("_HYYouKai-55W.ttf");
 }
 
 @font-face {
-  font-family: "Sassoon Book";
-  src: url("_SassoonBookW01Regular.ttf");
+    font-family: "Sassoon Book";
+    src: url("_SassoonBookW01Regular.ttf");
 }
 
 @font-face {
