@@ -5,6 +5,16 @@
     // =========================================================================
     // Debug logger (writes to #quizify-status if present)
     // =========================================================================
+    // Platform-agnostic card actions (Desktop pycmd vs AnkiDroid global functions)
+    window.__showAnswer = function() {
+        if (typeof pycmd === 'function') { pycmd('ans'); }
+        else if (typeof showAnswer === 'function') { showAnswer(); }
+    };
+    window.__rateCard = function(ease) {
+        if (typeof pycmd === 'function') { pycmd('ease' + ease); }
+        else { var fn = window['buttonAnswerEase' + ease]; if (typeof fn === 'function') fn(); }
+    };
+
     window.__quizifyLog = function(tag, msg) {
         var el = document.getElementById('quizify-status');
         if (el) el.textContent = (el.textContent || '') + ' [' + tag + '] ' + msg;
@@ -148,10 +158,8 @@
 
     function commitEase(ease) {
         window.__quizifyEase = ease;
-        if (typeof pycmd === 'function') {
-            state.phase = 'done';
-            pycmd('ans');
-        }
+        state.phase = 'done';
+        window.__showAnswer();
     }
 
     // =========================================================================
@@ -175,10 +183,8 @@
         var known = state.currentIndex;
         if (state.phase === 'revealing' && known > 0) known = known - 1;
         window.__quizifyRevealState = known + ':' + state.totalCount;
-        if (typeof pycmd === 'function') {
-            state.phase = 'done';
-            pycmd('ans');
-        }
+        state.phase = 'done';
+        window.__showAnswer();
     }
 
     function handleEasy() {
@@ -251,9 +257,7 @@
         var ease = window.__quizifyEase;
         if (ease) {
             delete window.__quizifyEase;
-            if (typeof pycmd === 'function') {
-                setTimeout(function() { pycmd('ease' + ease); }, 0);
-            }
+            setTimeout(function() { window.__rateCard(ease); }, 0);
         }
     })();
 

@@ -56,7 +56,7 @@ def main():
         ], tags=['GRE', 'vocabulary'])
         deck.add_note(note)
 
-    out = os.path.join(BASE, 'Deck', 'quizify-nested-reveal-test.apkg')
+    out = os.path.join(BASE, 'Deck', 'quizify-nested-reveal-test-android.apkg')
     media_path = os.path.join(BASE, 'Card Template', '_quizify.js')
     pkg = genanki.Package(deck, media_files=[media_path])
     pkg.write_to_file(out)

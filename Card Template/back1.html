@@ -489,19 +489,19 @@ Contact Details:
             switch (event.key) {
                 case "1":
                     event.preventDefault();
-                    pycmd('ease1');
+                    if (typeof window.__rateCard === 'function') window.__rateCard(1);
                     break;
                 case "2":
                     event.preventDefault();
-                    pycmd('ease2');
+                    if (typeof window.__rateCard === 'function') window.__rateCard(2);
                     break;
                 case "3":
                     event.preventDefault();
-                    pycmd('ease3');
+                    if (typeof window.__rateCard === 'function') window.__rateCard(3);
                     break;
                 case "4":
                     event.preventDefault();
-                    pycmd('ease4');
+                    if (typeof window.__rateCard === 'function') window.__rateCard(4);
                     break;
             }
         }
@@ -512,9 +512,7 @@ Contact Details:
         var ease = window.__quizifyEase;
         if (ease) {
             delete window.__quizifyEase;
-            if (typeof pycmd === 'function') {
-                setTimeout(function() { pycmd('ease' + ease); }, 0);
-            }
+            setTimeout(function() { window.__rateCard(ease); }, 0);
         }
     })();
 </script>

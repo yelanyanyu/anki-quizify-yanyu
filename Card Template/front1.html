@@ -461,7 +461,7 @@ Contact Details:
                 if (typeof window.QuizifyNestedReveal !== 'undefined' && window.QuizifyNestedReveal.handleKey(event.key)) {
                     return;
                 }
-                if (typeof pycmd === "function") pycmd("ans");
+                if (typeof window.__showAnswer === "function") window.__showAnswer();
             }
         }
     });
