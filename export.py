@@ -15,13 +15,13 @@ def read(path):
 def build_model():
     return genanki.Model(
         model_id=1698754321,
-        name='Quizify (Nested Reveal)',
+        name='quizify-word-by:yelanyanyu',
         fields=[
-            {'name': 'Front'},
+            {'name': 'Word'},
             {'name': 'Back'},
-            {'name': 'Deck'},
-            {'name': 'Tags'},
+            {'name': 'Media'},
             {'name': 'ExampleList'},
+            {'name': 'Notes'},
             {'name': 'Skip Replace'},
         ],
         templates=[{
@@ -38,24 +38,21 @@ def main():
     args = parser.parse_args()
 
     model = build_model()
-    deck = genanki.Deck(deck_id=1698754322, name='Quizify Test::Nested Reveal')
+    deck = genanki.Deck(deck_id=1698754323, name='quizify-word-by:yelanyanyu')
 
     if not args.no_card:
         note = genanki.Note(model=model, fields=[
-            '<b>ephemeral</b><br>'
-            '<div class="pronunciation-us">'
-            '<span style="cursor:pointer" onclick="playAudio(this.parentElement)">US /ɪˈfem.ər.əl/</span>'
-            '</div>',
+            '<b>ephemeral</b>',             # Word
             '<b>ephemeral</b> — transient, short-lived<br><br>'
             'From Greek <i>ephemeros</i> ("lasting one day").<br><br>'
             'Synonyms: transient, fleeting, momentary<br>'
-            'Antonyms: permanent, eternal, perpetual',
-            'English::GRE Vocabulary::Advanced',
-            'GRE vocabulary',
+            'Antonyms: permanent, eternal, perpetual',  # Back
+            '',                               # Media (empty for now)
             'The beauty of cherry blossoms is ephemeral, lasting only a few days.||'
             'The ephemeral nature of youth is a common theme in poetry.||'
-            'Social media trends are often ephemeral, disappearing within weeks.',
-            '',
+            'Social media trends are often ephemeral, disappearing within weeks.',  # ExampleList
+            '<i>From Greek ephemeros — lasting only one day.</i>',  # Notes
+            '',                               # Skip Replace
         ], tags=['GRE', 'vocabulary'])
         deck.add_note(note)
 

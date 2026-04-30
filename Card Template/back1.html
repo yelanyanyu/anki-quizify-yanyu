@@ -10,7 +10,12 @@ Contact Details:
 <div class="quizify-flashcard">
     <div id="quizify-status" style="display:none;font:10px monospace;color:#0f0;background:#111;padding:2px 8px;border-radius:0 0 4px 4px;margin:0 2em;word-break:break-all;"></div>
     <div class="quizify-deck">{{Deck}}</div>
-    <div class="quizify-field quizify-field--front">{{Front}}</div>
+    <div class="quizify-field quizify-field--front">
+        {{Word}}
+        {{#Media}}
+        <span style="cursor:pointer;margin-left:0.3em;" onclick="var a=this.querySelector('audio');if(a){a.pause();a.currentTime=0;a.play();}">{{Media}}</span>
+        {{/Media}}
+    </div>
     {{#ExampleList}}
     <div class="quizify-example-list">
         <span class="quizify-example-list__raw" style="display:none">{{ExampleList}}</span>
@@ -18,6 +23,9 @@ Contact Details:
         <div class="quizify-example-list__items"></div>
     </div>
     {{/ExampleList}}
+    {{#Notes}}
+    <div class="quizify-field quizify-field--notes" style="margin:0 2em 0.5em;padding:0.5em 0.8em;background:var(--example-item-bg);border-radius:0.4em;color:var(--example-item-fg);font-style:italic;">{{Notes}}</div>
+    {{/Notes}}
     {{#Back}}
     <hr class="quizify-divider quizify-divider--answer">
     <div class="quizify-field quizify-field--back">{{Back}}</div>
@@ -95,14 +103,17 @@ Contact Details:
 </script>
 
 <script>
-    // Breadcrumbs to current deck
+    // Breadcrumbs to current deck (hide if empty)
     var deckEl = document.querySelector(".quizify-deck");
-    var subDecks = deckEl.innerHTML.split("::").filter(Boolean);
-    html = [];
-    subDecks.forEach((subDeck) => {
-        html.push("<span class='quizify-subdeck'>" + subDeck + "</span>");
-    });
-    deckEl.innerHTML = html.join("&nbsp;/&nbsp;");
+    if (!deckEl.innerHTML.trim()) { deckEl.style.display = 'none'; }
+    else {
+        var subDecks = deckEl.innerHTML.split("::").filter(Boolean);
+        html = [];
+        subDecks.forEach(function(subDeck) {
+            html.push("<span class='quizify-subdeck'>" + subDeck + "</span>");
+        });
+        deckEl.innerHTML = html.join("&nbsp;/&nbsp;");
+    }
 </script>
 
 <script>
