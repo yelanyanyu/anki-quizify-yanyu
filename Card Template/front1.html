@@ -13,12 +13,9 @@ Contact Details:
 </script>
 
 <div class="quizify-flashcard">
-    <div id="quizify-status" style="font:10px monospace;color:#fff;background:#222;padding:2px 8px;border-radius:0 0 4px 4px;margin:0 2em;word-break:break-all;"></div>
+    <div id="quizify-status" style="display:none;font:10px monospace;color:#0f0;background:#111;padding:2px 8px;border-radius:0 0 4px 4px;margin:0 2em;word-break:break-all;"></div>
     <div class="quizify-deck">{{Deck}}</div>
     <div class="quizify-field quizify-field--front">{{Front}}</div>
-    {{#Tags}}
-    <div class="quizify-tags">{{clickable:Tags}}</div>
-    {{/Tags}}
     {{#ExampleList}}
     <div class="quizify-example-list">
         <span class="quizify-example-list__raw" style="display:none">{{ExampleList}}</span>
@@ -26,6 +23,21 @@ Contact Details:
         <div class="quizify-example-list__controls"></div>
     </div>
     {{/ExampleList}}
+    {{#Tags}}
+    <div class="quizify-tags">{{clickable:Tags}}</div>
+    {{/Tags}}
+</div>
+
+<div style="text-align:right;max-width:var(--card-max-width);margin:0 auto;padding:0 2em 1em;">
+    <button id="quizify-settings-btn" onclick="var p=document.getElementById('quizify-settings-popup');p.style.display=p.style.display==='none'?'block':'none';return false;" style="background:none;border:none;font-size:14px;cursor:pointer;opacity:0.5;" title="Settings">&#9881;</button>
+</div>
+<div id="quizify-settings-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card-bg);border:1px solid var(--divider);border-radius:8px;padding:16px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);min-width:220px;">
+    <div style="font-weight:bold;margin-bottom:12px;color:var(--text-primary);">Settings</div>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-primary);">
+        <input type="checkbox" id="quizify-debug-toggle" onchange="window.__quizifyToggleDebug(this.checked)">
+        <span>Debug Mode</span>
+    </label>
+    <button onclick="document.getElementById('quizify-settings-popup').style.display='none';return false;" style="display:block;margin-top:12px;padding:4px 16px;border:1px solid var(--divider);border-radius:4px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;">Close</button>
 </div>
 
 <script>
@@ -458,50 +470,4 @@ Contact Details:
         __quizifyLog('FATAL', 'QuizifyNestedReveal undefined');
     }
 
-</script>
-
-<!-- Quizify Debug Panel -->
-<div id="quizify-debug"
-     style="display:none;position:fixed;bottom:48px;right:8px;width:380px;max-height:300px;overflow:auto;background:#1a1a2e;color:#0f0;font:11px monospace;padding:8px;border-radius:4px;z-index:99999;opacity:0.92;"></div>
-<button id="quizify-debug-toggle"
-        onclick="(function(){var d=document.getElementById('quizify-debug');d.style.display=d.style.display==='none'?'block':'none'})()"
-        style="position:fixed;bottom:8px;right:8px;width:24px;height:24px;background:#333;color:#aaa;border:none;border-radius:4px;font:12px monospace;cursor:pointer;z-index:99999;opacity:0.7;">
-    &#9881;
-</button>
-<script>
-    (function () {
-        var panel = document.getElementById('quizify-debug');
-
-        function log(tag, msg, color) {
-            var d = document.createElement('div');
-            d.style.color = color || '#0f0';
-            d.style.borderBottom = '1px solid #333';
-            d.style.padding = '2px 0';
-            d.textContent = '[' + tag + '] ' + msg;
-            panel.appendChild(d);
-            panel.scrollTop = panel.scrollHeight;
-        }
-
-        window.onerror = function (msg, src, line, col, err) {
-            log('ERR', (msg + '').substring(0, 200), '#f66');
-            return false;
-        };
-        var _log = console.log, _err = console.error, _warn = console.warn;
-        console.log = function () {
-            var s = Array.prototype.join.call(arguments, ' ');
-            log('LOG', s.substring(0, 200));
-            _log.apply(console, arguments);
-        };
-        console.error = function () {
-            var s = Array.prototype.join.call(arguments, ' ');
-            log('ERR', s.substring(0, 200), '#f66');
-            _err.apply(console, arguments);
-        };
-        console.warn = function () {
-            var s = Array.prototype.join.call(arguments, ' ');
-            log('WRN', s.substring(0, 200), '#fa0');
-            _warn.apply(console, arguments);
-        };
-        console.log('Quizify debug panel ready');
-    })();
 </script>

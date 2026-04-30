@@ -8,8 +8,7 @@ Contact Details:
 
 -->
 <div class="quizify-flashcard">
-    <div id="quizify-status" style="font:10px monospace;color:#fff;background:#222;padding:2px 8px;border-radius:0 0 4px 4px;margin:0 2em;word-break:break-all;"></div>
-    <script>if(!window.__quizifyLog){window.__quizifyLog=function(t,m){var e=document.getElementById("quizify-status");if(e)e.textContent=(e.textContent||"")+" ["+t+"] "+m;};} __quizifyLog("BACK","loaded");</script>
+    <div id="quizify-status" style="display:none;font:10px monospace;color:#0f0;background:#111;padding:2px 8px;border-radius:0 0 4px 4px;margin:0 2em;word-break:break-all;"></div>
     <div class="quizify-deck">{{Deck}}</div>
     <div class="quizify-field quizify-field--front">{{Front}}</div>
     {{#ExampleList}}
@@ -26,6 +25,18 @@ Contact Details:
     {{#Tags}}
     <div class="quizify-tags">{{clickable:Tags}}</div>
     {{/Tags}}
+</div>
+
+<div style="text-align:right;max-width:var(--card-max-width);margin:0 auto;padding:0 2em 1em;">
+    <button id="quizify-settings-btn" onclick="var p=document.getElementById('quizify-settings-popup');p.style.display=p.style.display==='none'?'block':'none';return false;" style="background:none;border:none;font-size:14px;cursor:pointer;opacity:0.5;" title="Settings">&#9881;</button>
+</div>
+<div id="quizify-settings-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card-bg);border:1px solid var(--divider);border-radius:8px;padding:16px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);min-width:220px;">
+    <div style="font-weight:bold;margin-bottom:12px;color:var(--text-primary);">Settings</div>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-primary);">
+        <input type="checkbox" id="quizify-debug-toggle" onchange="window.__quizifyToggleDebug(this.checked)">
+        <span>Debug Mode</span>
+    </label>
+    <button onclick="document.getElementById('quizify-settings-popup').style.display='none';return false;" style="display:block;margin-top:12px;padding:4px 16px;border:1px solid var(--divider);border-radius:4px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;">Close</button>
 </div>
 
 <script>

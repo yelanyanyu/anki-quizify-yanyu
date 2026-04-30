@@ -9,6 +9,20 @@
         var el = document.getElementById('quizify-status');
         if (el) el.textContent = (el.textContent || '') + ' [' + tag + '] ' + msg;
     };
+    window.__quizifyToggleDebug = function(on) {
+        var el = document.getElementById('quizify-status');
+        if (el) el.style.display = on ? 'block' : 'none';
+        window.__quizifyDebug = on;
+        var cb = document.getElementById('quizify-debug-toggle');
+        if (cb) cb.checked = on;
+    };
+    // Restore previous debug state
+    if (window.__quizifyDebug) {
+        var el = document.getElementById('quizify-status');
+        if (el) el.style.display = 'block';
+        var cb = document.getElementById('quizify-debug-toggle');
+        if (cb) cb.checked = true;
+    }
     __quizifyLog('JS', 'loaded');
 
     // =========================================================================
