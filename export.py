@@ -25,7 +25,7 @@ def build_model():
             {'name': 'Skip Replace'},
         ],
         templates=[{
-            'name': 'Card 1',
+            'name': 'quizify-word-by:yelanyanyu',
             'qfmt': read('Card Template/front1.html'),
             'afmt': read('Card Template/back1.html'),
         }],
