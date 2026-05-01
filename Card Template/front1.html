@@ -28,6 +28,9 @@ Contact Details:
         <div class="quizify-example-list__controls"></div>
     </div>
     {{/ExampleList}}
+    {{#ExampleTranslation}}
+    <span class="quizify-example-translation__raw" style="display:none">{{ExampleTranslation}}</span>
+    {{/ExampleTranslation}}
     {{#Tags}}
     <div class="quizify-tags">{{clickable:Tags}}</div>
     {{/Tags}}

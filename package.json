@@ -1,0 +1,15 @@
+{
+  "name": "anki-quizify",
+  "version": "1.0.0",
+  "description": "> Forked from [Quizify (格致)](https://github.com/e-chehil/anki-quizify) by @chehil (翏央).   > 在原始 Quizify 交互模板基础上，新增「逐层渐进揭示 + 自动评分」单词学习模式。",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.28.0"
+  }
+}

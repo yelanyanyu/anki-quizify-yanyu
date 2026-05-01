@@ -21,6 +21,7 @@ def build_model():
             {'name': 'Back'},
             {'name': 'Media'},
             {'name': 'ExampleList'},
+            {'name': 'ExampleTranslation'},
             {'name': 'Notes'},
             {'name': 'Skip Replace'},
         ],
@@ -51,6 +52,9 @@ def main():
             'The beauty of cherry blossoms is ephemeral, lasting only a few days.||'
             'The ephemeral nature of youth is a common theme in poetry.||'
             'Social media trends are often ephemeral, disappearing within weeks.',  # ExampleList
+            '樱花之美转瞬即逝，只持续几天。||'
+            '青春易逝是诗歌中的常见主题。||'
+            '社交媒体的热度通常转瞬即逝，几周内就消失了。',  # ExampleTranslation
             '<i>From Greek ephemeros — lasting only one day.</i>',  # Notes
             '',                               # Skip Replace
         ], tags=['GRE', 'vocabulary'])

@@ -660,6 +660,14 @@ mark {
     vertical-align: middle;
 }
 
+.quizify-example-list__item-translation {
+    color: var(--caption-fg);
+    display: block;
+    font-size: 0.85em;
+    margin-top: 0.3em;
+    padding-left: 1.6em;
+}
+
 .quizify-example-list__controls {
     display: flex;
     gap: 0.5em;

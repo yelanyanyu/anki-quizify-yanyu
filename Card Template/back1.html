@@ -23,6 +23,9 @@ Contact Details:
         <div class="quizify-example-list__items"></div>
     </div>
     {{/ExampleList}}
+    {{#ExampleTranslation}}
+    <span class="quizify-example-translation__raw" style="display:none">{{ExampleTranslation}}</span>
+    {{/ExampleTranslation}}
     {{#Notes}}
     <div class="quizify-field quizify-field--notes" style="margin:0 2em 0.5em;padding:0.5em 0.8em;background:var(--example-item-bg);border-radius:0.4em;color:var(--example-item-fg);font-style:italic;">{{Notes}}</div>
     {{/Notes}}
